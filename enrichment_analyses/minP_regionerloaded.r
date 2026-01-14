@@ -12,7 +12,7 @@ if (length(args) == 0) {
 }
 experiment = args[1]
 if (experiment == "TF") {
-  fn = "results/CMPRA5_minP/lichic_TF_proms_chip.rds"
+  fn = "results/CMPRA5_minP/lichic_TF_chip.rds"
   fig = "results/manuscript_figures/minP/minP_heatmap_TF_enrichment.pdf"
 } else if (experiment == "unbiasedTF") {
   fn = "results/CMPRA5_minP/lichic_unbiasedTF_proms_chip.rds"
@@ -24,42 +24,42 @@ if (experiment == "TF") {
   stop("Invalid argument. Use 'TF', 'unbiasedTF', or 'accessibility'.")
 } 
 
-# upbed <- "results/CMPRA5_minP/higher_CMPRA_CREs.bed"
-# downbed <- "results/CMPRA5_minP/lower_CMPRA_CREs.bed"
-# backgroundbed <- "results/CMPRA5_minP/similar_CREs.bed"
+upbed <- "results/CMPRA5_minP/higher_CMPRA_distal_CREs.bed"
+downbed <- "results/CMPRA5_minP/lower_CMPRA_distal_CREs.bed"
+backgroundbed <- "results/CMPRA5_minP/similar_distal_CREs.bed"
 
 # upbed <- "results/CMPRA5_minP/high_psi_promoters.bed"
 # downbed <- "results/CMPRA5_minP/low_psi_promoters.bed"
 # backgroundbed <- "results/CMPRA5_minP/mid_psi_promoters.bed"
 
-# data_up <- read.table(upbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
-# data_down <- read.table(downbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
-# data_bg <- read.table(backgroundbed, header = F, sep="\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
+data_up <- read.table(upbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
+data_down <- read.table(downbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
+data_bg <- read.table(backgroundbed, header = F, sep="\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
 
-# OE_GR_1 <- GenomicRanges::makeGRangesFromDataFrame(data_up, seqnames.field = "chr",start.field = "start",end.field = "end")
-# OE_GR_2 <- GenomicRanges::makeGRangesFromDataFrame(data_down, seqnames.field = "chr",start.field = "start",end.field = "end")
-# OE_GR_3 <- GenomicRanges::makeGRangesFromDataFrame(data_bg, seqnames.field = "chr",start.field = "start",end.field = "end")
-# GR_OEs <- list(high_PSI=OE_GR_1,low_PSI=OE_GR_2, mid_PSI=OE_GR_3)
+OE_GR_1 <- GenomicRanges::makeGRangesFromDataFrame(data_up, seqnames.field = "chr",start.field = "start",end.field = "end")
+OE_GR_2 <- GenomicRanges::makeGRangesFromDataFrame(data_down, seqnames.field = "chr",start.field = "start",end.field = "end")
+OE_GR_3 <- GenomicRanges::makeGRangesFromDataFrame(data_bg, seqnames.field = "chr",start.field = "start",end.field = "end")
+GR_OEs <- list(high_PSI=OE_GR_1,low_PSI=OE_GR_2, mid_PSI=OE_GR_3)
 
-# # Now we prepare the data of ChIP-seq
-# # we do the same, read the bed files and turn them into GenomicRanges
-# features <- c("data/HepG2_H3K4me3_ENCSR575RRX/ENCFF982DUT.bed.gz",
-# 				"data/HepG2_H3K27ac_ENCSR000AMO/ENCFF392KDI.bed.gz",
-# 				"data/HepG2_ATAC_ENCSR042AWH/ENCFF913MQB.bed.gz",
-# 				# "data/HepG2_CTCF_ENCSR000BIE/ENCFF254DEQ.bed.gz",
-# 				# "data/HepG2_RAD21_ENCSR000EEG/ENCFF145VFI.bed.gz",
-# 				"data/HepG2_H3K9me3_ENCSR000ATD/ENCFF533JQH.bed.gz",
-# 				"data/HepG2_H3K4me1_ENCSR000APV/ENCFF428FAW.bed.gz",
-# 				"data/HepG2_DNase_ENCSR149XIL/ENCFF209DJG.bed.gz",
-# 				"data/HepG2_H3K27me3_ENCSR000DUE/ENCFF982CSD.bed.gz", 
-# 				"data/HepG2_H3K9ac_ENCSR000AMD/ENCFF358CJW.bed.gz",
-# 				"data/HepG2_H3K79me2_ENCSR000AOM/ENCFF500KVU.bed.gz",
-# 				"data/HepG2_H3K4me2_ENCSR000AMC/ENCFF769MUQ.bed.gz",
-# 				"data/HepG2_H4K20me1_ENCSR000AMQ/ENCFF133PSF.bed.gz",
-# 				"data/HepG2_H2AFZ_ENCSR000AOK/ENCFF474NDN.bed.gz",
-# 				"data/HepG2_H3K36me3_ENCSR000DUD/ENCFF524PMT.bed.gz",
-# 				"data/HepG2_ReMAP_TF_ChIPSeq/remap2022_Hep-G2_4cols.bed.gz")
-# names(features) <- c("H3K4me3","H3K27ac", "ATAC", "H3K9me3", "H3K4me1", "DNase", "H3K27me3", "H3K9ac", "H3K79me2", "H3K4me2", "H4K20me1", "H2AFZ", "H3K36me3", "TFs")
+# Now we prepare the data of ChIP-seq
+# we do the same, read the bed files and turn them into GenomicRanges
+features <- c("data/HepG2_H3K4me3_ENCSR575RRX/ENCFF982DUT.bed.gz",
+				"data/HepG2_H3K27ac_ENCSR000AMO/ENCFF392KDI.bed.gz",
+				"data/HepG2_ATAC_ENCSR042AWH/ENCFF913MQB.bed.gz",
+				# "data/HepG2_CTCF_ENCSR000BIE/ENCFF254DEQ.bed.gz",
+				# "data/HepG2_RAD21_ENCSR000EEG/ENCFF145VFI.bed.gz",
+				"data/HepG2_H3K9me3_ENCSR000ATD/ENCFF533JQH.bed.gz",
+				"data/HepG2_H3K4me1_ENCSR000APV/ENCFF428FAW.bed.gz",
+				"data/HepG2_DNase_ENCSR149XIL/ENCFF209DJG.bed.gz",
+				"data/HepG2_H3K27me3_ENCSR000DUE/ENCFF982CSD.bed.gz", 
+				"data/HepG2_H3K9ac_ENCSR000AMD/ENCFF358CJW.bed.gz",
+				"data/HepG2_H3K79me2_ENCSR000AOM/ENCFF500KVU.bed.gz",
+				"data/HepG2_H3K4me2_ENCSR000AMC/ENCFF769MUQ.bed.gz",
+				"data/HepG2_H4K20me1_ENCSR000AMQ/ENCFF133PSF.bed.gz",
+				"data/HepG2_H2AFZ_ENCSR000AOK/ENCFF474NDN.bed.gz",
+				"data/HepG2_H3K36me3_ENCSR000DUD/ENCFF524PMT.bed.gz",
+				"data/HepG2_ReMAP_TF_ChIPSeq/remap2022_Hep-G2_4cols.bed.gz")
+names(features) <- c("H3K4me3","H3K27ac", "ATAC", "H3K9me3", "H3K4me1", "DNase", "H3K27me3", "H3K9ac", "H3K79me2", "H3K4me2", "H4K20me1", "H2AFZ", "H3K36me3", "TFs")
 
 # # then we have to transform them to GenomicRanges
 # ftlist <- list()
@@ -109,7 +109,7 @@ if (experiment == "TF") {
 
 
 # saveRDS(lichic_chip_OE, file=fn)
-# #saveRDS(lichic_chip_OE, file="results/manuscript_figures/figure3/lichic_chip_noeffectBG_OE.rds")
+# # #saveRDS(lichic_chip_OE, file="results/manuscript_figures/figure3/lichic_chip_noeffectBG_OE.rds")
 
 
 lichic_chip_OE <- readRDS(fn)
@@ -167,20 +167,21 @@ if (experiment == "accessibility" || experiment == "TF") {
 combined_data <- combined_data %>%
   mutate(significance = ifelse(adj.p_value < 0.05, "Significant", "Not Significant"))
 
-# wide_data <- combined_data %>%
-# 	select(name, PSI, norm_zscore, adj.p_value, significance) %>%
-# 	tidyr::pivot_wider(
-# 		names_from = PSI,
-# 		values_from = c(norm_zscore, adj.p_value, significance)
-# 	) %>%
-# 	# compute an ordering value (average of the two z-scores) for plotting
-# 	mutate(
-# 		avg_z = rowMeans(
-# 			cbind(norm_zscore_Upregulating, norm_zscore_Downregulating),
-# 			na.rm = TRUE
-# 		),
-# 	) %>%
-# 	arrange(avg_z)
+wide_data <- combined_data %>%
+	select(name, PSI, norm_zscore, adj.p_value, significance) %>%
+	tidyr::pivot_wider(
+		names_from = PSI,
+		values_from = c(norm_zscore, adj.p_value, significance)
+	) 
+	# %>%
+	# # compute an ordering value (average of the two z-scores) for plotting
+	# mutate(
+	# 	avg_z = rowMeans(
+	# 		cbind(norm_zscore_high_PSI, norm_zscore_low_PSI),
+	# 		na.rm = TRUE
+	# 	),
+	# ) %>%
+	# arrange(avg_z)
 
 # Plot the data
 pdf(fig, width = 6, height = 5)  # Adjust width and height
@@ -207,7 +208,7 @@ ggplot(combined_data, aes(x = norm_zscore, y = reorder(name, norm_zscore), fill 
 		legend.title = element_text(size = 12),
 		panel.grid.major.y = element_line(color = "gray90"),
 		panel.grid.major.x = element_blank(),
-		axis.text.y = element_text(size = 12),
+		axis.text.y = element_text(size = 11),
 		axis.text.x = element_text(size = 12)
 	) +
 	# star/asterisk for significant, filled circle for non-significant

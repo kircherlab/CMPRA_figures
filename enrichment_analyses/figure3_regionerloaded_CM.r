@@ -9,14 +9,14 @@ set.seed(42)
 
 args <- commandArgs(TRUE)
 if (length(args) == 0) {
-  upbed <- "results/manuscript_figures/CRE_enrichment_plot/upregulating_OEs_nonprom.bed"
+  upbed <- "results/manuscript_figures/CRE_enrichment_plot/upregulating_distal_OEs_nonprom.bed"
   up_name <- "Enhancer"
   down_name <- "Silencer"
   mid_name <- "No Effect"
-  midbed <- "results/manuscript_figures/CRE_enrichment_plot/no_effect_OEs_nonprom.bed"
-  downbed <- "results/manuscript_figures/CRE_enrichment_plot/downregulating_OEs_nonprom.bed"
-  outfile <- "results/manuscript_figures/figure3/dotplot_accessibility_enrichment.pdf"
-  rds <- "results/manuscript_figures/figure3/lichic_CM_chip_including_noeffect_OE.rds"
+  midbed <- "results/manuscript_figures/CRE_enrichment_plot/no_effect_distal_OEs_nonprom.bed"
+  downbed <- "results/manuscript_figures/CRE_enrichment_plot/downregulating_distal_OEs_nonprom.bed"
+  outfile <- "results/manuscript_figures/figure3/dotplot_accessibility_all_distal_enrichment.pdf"
+  rds <- "results/manuscript_figures/figure3/lichic_CM_chip_including_all_distal_OE.rds"
 } else {
   upbed <- args[1]
   downbed <- args[2]
@@ -29,12 +29,22 @@ if (length(args) == 0) {
 
 data_up <- read.table(upbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
 data_down <- read.table(downbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
-data_mid <- read.table(midbed, header = F, sep = "\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
+
+if (exists("midbed")) {
+  data_mid <- read.table(midbed, header = F, sep="\t", col.names = c("chr", "start", "end", "name", "strand", "score"))
+  OE_GR_3 <- GenomicRanges::makeGRangesFromDataFrame(data_mid, seqnames.field = "chr",start.field = "start",end.field = "end")
+}
 
 OE_GR_1 <- GenomicRanges::makeGRangesFromDataFrame(data_up, seqnames.field = "chr",start.field = "start",end.field = "end")
 OE_GR_2 <- GenomicRanges::makeGRangesFromDataFrame(data_down, seqnames.field = "chr",start.field = "start",end.field = "end")
-OE_GR_3 <- GenomicRanges::makeGRangesFromDataFrame(data_mid, seqnames.field = "chr",start.field = "start",end.field = "end")
-GR_OEs <- list(Upregulating_OE=OE_GR_1,Downregulating_OE=OE_GR_2,No_Effect_OE=OE_GR_3)
+
+if (exists("OE_GR_3")) {
+  GR_OEs <- list(Upregulating_OE=OE_GR_1,Downregulating_OE=OE_GR_2, No_Effect_OE=OE_GR_3)
+} else {
+  GR_OEs <- list(Upregulating_OE=OE_GR_1,Downregulating_OE=OE_GR_2)
+}
+
+
 # Now we prepare the data of ChIP-seq
 # we do the same, read the bed files and turn them into GenomicRanges
 features <- c("data/HepG2_H3K4me3_ENCSR575RRX/ENCFF982DUT.bed.gz",
@@ -62,17 +72,20 @@ names(ftlist) <- names(features)
 # now we performe the crosswise permutation test, using 5000 sampling of the data and 100 permutations. 
 # The function that we use for randomization if "randomizeRegions" (NOTE: It can take a while, but you 
 # # can do it in parallel using the argument mc.cores) and the evalutation function is "numOveralps".
+
+set.seed(42)
 lichic_chip_OE <-  crosswisePermTest(
   Alist = GR_OEs,
   Blist = ftlist,
   sampling = TRUE,
-  fraction = 0.018, # approximately 1000 regions
-  min_sampling = 1000,
+  fraction = 0.5, # approximately 1000 regions
+  min_sampling = 2000,
   ranFUN = "randomizeRegions", 
   evFUN = "numOverlaps", 
   ntimes = 1000,
   genome = "hg38",
-  mc.cores = 20
+  mc.cores = 20, 
+  mc.set.seed = FALSE
 )
 # Use clusterize=F when using only two sets of regions
 # Finally we generate the matrix that summarise this analysis
